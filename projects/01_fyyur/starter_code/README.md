@@ -17,38 +17,6 @@ This app is nearly complete. It is only missing one thing… real data! While th
 
 We want Fyyur to be the next new platform that artists and musical venues can use to find each other, and discover new music shows. Let's make that happen!
 
-## Tech Stack (Dependencies)
-
-### 1. Backend Dependencies
-Our tech stack will include the following:
- * **virtualenv** as a tool to create isolated Python environments
- * **SQLAlchemy ORM** to be our ORM library of choice
- * **PostgreSQL** as our database of choice
- * **Python3** and **Flask** as our server language and server framework
- * **Flask-Migrate** for creating and running schema migrations
-You can download and install the dependencies mentioned above using `pip` as:
-```
-pip install virtualenv
-pip install SQLAlchemy
-pip install postgres
-pip install Flask
-pip install Flask-Migrate
-```
-> **Note** - If we do not mention the specific version of a package, then the default latest stable package will be installed. 
-
-### 2. Frontend Dependencies
-You must have the **HTML**, **CSS**, and **Javascript** with [Bootstrap 3](https://getbootstrap.com/docs/3.4/customize/) for our website's frontend. Bootstrap can only be installed by Node Package Manager (NPM). Therefore, if not already, download and install the [Node.js](https://nodejs.org/en/download/). Windows users must run the executable as an Administrator, and restart the computer after installation. After successfully installing the Node, verify the installation as shown below.
-```
-node -v
-npm -v
-```
-Install [Bootstrap 3](https://getbootstrap.com/docs/3.3/getting-started/) for the website's frontend:
-```
-npm init -y
-npm install bootstrap@3
-```
-
-
 ## Main Files: Project Structure
 
   ```sh
@@ -121,16 +89,6 @@ Acceptance Criteria
   * The right _type_ of relationship and parent-child dynamics between models should be accurately identified and fit the needs of this particular application.
   * The relationship between the models should be accurately configured, and referential integrity amongst the models should be preserved.
   * `flask db migrate` should work, and populate my local postgres database with properly configured tables for this application's objects, including proper columns, column data types, constraints, defaults, and relationships that completely satisfy the needs of this application. The proper type of relationship between venues, artists, and shows should be configured.
-
-##### Stand Out
-
-Looking to go above and beyond? This is the right section for you! Here are some challenges to make your submission stand out:
-
-*  Implement artist availability. An artist can list available times that they can be booked. Restrict venues from being able to create shows with artists during a show time that is outside of their availability.
-* Show Recent Listed Artists and Recently Listed Venues on the homepage, returning results for Artists and Venues sorting by newly created. Limit to the 10 most recently listed items.
-* Implement Search Artists by City and State, and Search Venues by City and State. Searching by "San Francisco, CA" should return all artists or venues in San Francisco, CA.
-
-Best of luck in your final project! Fyyur depends on you!
 
 
 ## Development Setup
