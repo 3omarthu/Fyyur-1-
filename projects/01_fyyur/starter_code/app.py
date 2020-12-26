@@ -114,12 +114,12 @@ def show_venue(venue_id):
   data_shows=[]
 
   for show in shows:
-    data = {
-          "artist_id": show.artist_id,
-          "artist_name": show.artist.name,
-           "artist_image_link": show.artist.image_link,
-           "start_time": format_datetime(str(show.start_time))
-        }
+      data = {
+            "artist_id": show.artist_id,
+            "artist_name": show.artist.name,
+            "artist_image_link": show.artist.image_link,
+            "start_time": format_datetime(str(show.start_time))
+            }
         
   for show in upcoming_shows_details:
       data_shows.append({
@@ -169,18 +169,18 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
+      form = VenueForm(request.form)
       try:
         newVenue = Venue(
-        name=request.form['name'], 
-        city= request.form['city'], 
-        state= request.form['state'], 
-        address= request.form['address'],
-        genres = request.form.getlist('genres'),
-        phone= request.form['phone'],  
-        facebook_link= request.form['facebook_link'],
-        image_link = request.form['image_link'],
-        seeking_talent = request.form['seeking_talent'],
-        seeking_description = request.form['seeking_description']
+        name=form.name.data, 
+        city= form.city.data, 
+        address=form.address.data ,
+        genres =form.genres.getlist ,
+        phone=form.phone.data ,  
+        facebook_link=form.facebook_link.data,
+        image_link =form.image_link.data ,
+        seeking_talent =form.seeking_talent.data ,
+        seeking_description =form.seeking_description.data
         )
         db.session.add(newVenue)
         
@@ -258,7 +258,7 @@ def show_artist(artist_id):
   current_time = datetime.now()
   upcoming_shows_details = db.session.query(Show).join(Artist).filter(Show.venue_id==venue_id).all()
   past_show_details=db.session.query(Show).join(Artist).filter(Show.venue_id==venue_id).all()
-
+  data_shows = []
 
  for show in upcoming_shows_details:
       data_shows.append({
@@ -400,16 +400,18 @@ def create_artist_form():
 
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
+      form = ArtistForm(request.form)
       try:
         newArtist = Artist(
-        name=request.form['name'], 
-        city= request.form['city'], 
-        state= request.form['state'], 
-        phone= request.form['phone'],  
-        facebook_link= request.form['facebook_link'],
-        image_link = request.form['image_link'],
-        seeking_venu = request.form['seeking_venu'],
-        seeking_description = request.form['seeking_description']
+        name=form.name.data, 
+        city= form.city.data, 
+        address=form.address.data ,
+        genres =form.genres.getlist ,
+        phone=form.phone.data ,  
+        facebook_link=form.facebook_link.data,
+        image_link =form.image_link.data ,
+        seeking_venu =form.seeking_venu.data ,
+        seeking_description =form.seeking_description.data
         )
         db.session.add(newArtist)
         db.session.commit()
@@ -449,11 +451,12 @@ def create_shows():
 
 @app.route('/shows/create', methods=['POST'])
 def create_show_submission():
+      form = ShowForm(request.form)
       try:
         newShow = Show(
-        artist_id = request.form['artist_id'], 
-        venue_id= request.form['venue_id'], 
-        start_time= request.form['start_time']
+        artist_id =form.artist_id.data, 
+        venue_id=form.venue_id.data, 
+        start_time=form.start_time.data
         )
         db.session.add(newShow)
         db.session.commit()
