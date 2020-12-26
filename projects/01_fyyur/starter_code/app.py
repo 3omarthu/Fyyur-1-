@@ -14,74 +14,22 @@ from flask_wtf import Form
 from forms import *
 from flask_migrate import Migrate
 from datetime import datetime
+from models import app, db, Venue, Artist, Show
 import sys
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
 
-app = Flask(__name__)
+
 moment = Moment(app)
 app.config.from_object('config')
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+db.init_app(app)
 
 #----------------------------------------------------------------------------#
 # Models.
 #----------------------------------------------------------------------------#
 
-class Venue(db.Model):
-    __tablename__ = 'Venue'
-
-    id = db.Column(db.Integer, primary_key=True )
-    name = db.Column(db.String, nullable = False)
-    city = db.Column(db.String(120), nullable = False)
-    state = db.Column(db.String(120), nullable = False)
-    address = db.Column(db.String(120), nullable = False)
-    phone = db.Column(db.String(120),unique=True, nullable = False)
-    image_link = db.Column(db.String(500), nullable = True)
-    genres = db.Column(db.String(120), nullable = True)
-    facebook_link = db.Column(db.String(120), nullable = True)
-    website = db.Column(db.String(120), nullable = True)
-    seeking_talent = db.Column(db.Boolean, default=False)
-    seeking_description = db.Column(db.String(120), nullable = True)
-    shows = db.relationship('Show', backref = 'Venue', lazy = True)
-    
-    
-    
-
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
-
-class Artist(db.Model):
-    __tablename__ = 'Artist'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable = False)
-    city = db.Column(db.String(120), nullable = False)
-    state = db.Column(db.String(120), nullable = False)
-    phone = db.Column(db.String(120),unique=True, nullable = False)
-    image_link = db.Column(db.String(500), nullable = True)
-    genres = db.Column(db.String(120), nullable = True)
-    facebook_link = db.Column(db.String(120), nullable = True)
-    seeking_venue = db.Column(db.Boolean, default=False)
-    seeking_description = db.Column(db.String(120))
-    shows = db.relationship('Show', backref = 'Artist', lazy = True)
-    
-    
-
-    
-class Show(db.Model):
-    __tablename__ = 'Show'
-
-    id = db.Column(db.Integer, primary_key=True, autoincrement = True)
-    artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'))
-    venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'))
-    start_time = db.Column(db.DateTime, nullable = False)
-    venue = db.relationship('Venue')
-    artist = db.relationship('Artist')
-
-
-
-
+#models.py
 
 #----------------------------------------------------------------------------#
 # Filters.
@@ -158,10 +106,12 @@ def search_venues():
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
   venue = Venue.query.get(venue_id)
-  shows = Show.query.filter_by(venue_id=venue_id).all()
   past_shows = []
   upcoming_shows = []
   current_time = datetime.now().strftime('%Y-%m-%d %H:%S:%M')
+  upcoming_shows_details = db.session.query(Show).join(Artist).filter(Show.venue_id==venue_id).all()
+  past_show_details=db.session.query(Show).join(Artist).filter(Show.venue_id==venue_id).all()
+  data_shows=[]
 
   for show in shows:
     data = {
@@ -170,10 +120,22 @@ def show_venue(venue_id):
            "artist_image_link": show.artist.image_link,
            "start_time": format_datetime(str(show.start_time))
         }
-    # if show.start_time > current_time:
-    #   upcoming_shows.append(data)
-    # else:
-    #   past_shows.append(data)
+        
+  for show in upcoming_shows_details:
+      data_shows.append({
+      #here you data as start_time
+      'start_time': show.start_time.strftime('%Y-%m-%d %H:%M:%S'),
+      })
+      if data_shows.start_time > current_time:
+          upcoming_shows.append(data)
+
+  for show in past_show_details:
+      data_shows.append({
+      #here you data as start_time
+      'start_time': show.start_time.strftime('%Y-%m-%d %H:%M:%S'),
+      })
+      if data_shows.start_time > current_time:
+          past_shows.append(data)
 
   data={
     "id": venue.id,
@@ -216,7 +178,9 @@ def create_venue_submission():
         genres = request.form.getlist('genres'),
         phone= request.form['phone'],  
         facebook_link= request.form['facebook_link'],
-        image_link = request.form['image_link']
+        image_link = request.form['image_link'],
+        seeking_talent = request.form['seeking_talent'],
+        seeking_description = request.form['seeking_description']
         )
         db.session.add(newVenue)
         
@@ -289,22 +253,29 @@ def search_artists():
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
   artist = Artist.query.get(artist_id)
-  shows = Show.query.filter_by(artist_id=artist_id).all()
   past_shows = []
   upcoming_shows = []
   current_time = datetime.now()
+  upcoming_shows_details = db.session.query(Show).join(Artist).filter(Show.venue_id==venue_id).all()
+  past_show_details=db.session.query(Show).join(Artist).filter(Show.venue_id==venue_id).all()
 
-  for show in shows:
-    data = {
-          "venue_id": show.venue_id,
-          "venue_name": show.venue.name,
-          "venue_image_link": show.venue.image_link,
-          "start_time": format_datetime(str(show.start_time))
-        }
-    if show.start_time > current_time:
-      upcoming_shows.append(data)
-    else:
-      past_shows.append(data)
+
+ for show in upcoming_shows_details:
+      data_shows.append({
+      #here you data as start_time
+      'start_time': show.start_time.strftime('%Y-%m-%d %H:%M:%S'),
+      })
+      if data_shows.start_time > current_time:
+          upcoming_shows.append(data)
+
+  for show in past_show_details:
+      data_shows.append({
+      #here you data as start_time
+      'start_time': show.start_time.strftime('%Y-%m-%d %H:%M:%S'),
+      })
+      if data_shows.start_time > current_time:
+          past_shows.append(data)
+
 
   data={
     "id": artist.id,
@@ -436,7 +407,10 @@ def create_artist_submission():
         state= request.form['state'], 
         phone= request.form['phone'],  
         facebook_link= request.form['facebook_link'],
-        image_link = request.form['image_link'])
+        image_link = request.form['image_link'],
+        seeking_venu = request.form['seeking_venu'],
+        seeking_description = request.form['seeking_description']
+        )
         db.session.add(newArtist)
         db.session.commit()
 
